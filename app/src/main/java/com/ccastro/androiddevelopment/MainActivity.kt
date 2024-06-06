@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ccastro.androiddevelopment.ui.theme.AndroidDevelopmentTheme
+import org.jetbrains.annotations.VisibleForTesting
 import java.text.NumberFormat
 import kotlin.math.ceil
 
@@ -55,53 +56,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TipTimeLayoutPreview()
+                    TipTimeLayout()
                 }
             }
         }
-    }
-}
-
-@Composable
-fun EditNumberField(
-    @StringRes label: Int,
-    @DrawableRes leadingIcon: Int,
-    keyboardOptions: KeyboardOptions,
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TextField(
-        value = value,
-        leadingIcon = { Icon(painter = painterResource(id = leadingIcon), contentDescription = "")},
-        onValueChange = onValueChange,
-        singleLine = true,
-        label = { Text(text = stringResource(id = label)) },
-        keyboardOptions = keyboardOptions,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun RoundTheTipRow(
-    roundUp: Boolean,
-    onRoundUpChanged: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row (
-        modifier = modifier
-            .fillMaxWidth()
-            .size(48.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Text(text = stringResource(R.string.round_up_tip))
-        Switch(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.End),
-            checked = roundUp,
-            onCheckedChange = onRoundUpChanged
-        )
     }
 }
 
@@ -178,13 +136,57 @@ fun TipTimeLayout() {
     }
 }
 
+@Composable
+fun EditNumberField(
+    @StringRes label: Int,
+    @DrawableRes leadingIcon: Int,
+    keyboardOptions: KeyboardOptions,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = value,
+        leadingIcon = { Icon(painter = painterResource(id = leadingIcon), contentDescription = "")},
+        onValueChange = onValueChange,
+        singleLine = true,
+        label = { Text(text = stringResource(id = label)) },
+        keyboardOptions = keyboardOptions,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun RoundTheTipRow(
+    roundUp: Boolean,
+    onRoundUpChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row (
+        modifier = modifier
+            .fillMaxWidth()
+            .size(48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text(text = stringResource(R.string.round_up_tip))
+        Switch(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.End),
+            checked = roundUp,
+            onCheckedChange = onRoundUpChanged
+        )
+    }
+}
+
 
 /**
  * Calculates the tip based on the user input and format the tip amount
  * according to the local currency.
  * Example would be "$10.00".
  */
-private fun calculateTip(amount: Double, tipPercent: Double = 15.0, roundUp: Boolean) : String {
+@VisibleForTesting
+internal fun calculateTip(amount: Double, tipPercent: Double = 15.0, roundUp: Boolean) : String {
     var tip = tipPercent / 100 * amount
     if (roundUp) tip = ceil(tip)
     return NumberFormat.getCurrencyInstance().format(tip)
